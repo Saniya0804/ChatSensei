@@ -1,0 +1,10 @@
+.full{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+.navbar{
+    height:70px;
+    background-color: #2563eb;
+    color:white
+}

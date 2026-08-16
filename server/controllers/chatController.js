@@ -19,7 +19,7 @@ const splitter = new RecursiveCharacterTextSplitter({
 });
 const session=async(req,res)=>{
 try{
-    const {userid}=req.body;
+    const userid=req.userId;
     const [result]=await db.query("insert into chat_session (user_id,session_name) values(?,?)",[userid,"temp"]);
 res.json({
 success:true,
@@ -35,7 +35,7 @@ catch(error){
 }
 const ask=async(req,res)=>{
     try{
-const userid=parseInt(req.params.id);
+const userid=req.userId;
 const question=req.body.question;
 const sessionId=parseInt(req.body.sessionId);
 let rows;
@@ -46,7 +46,7 @@ if(rows.length==0){
         message:"PDF file not found"
     }); 
 }
-const allDocs=[];
+const allDocs=[];     
 console.log("rows.............",rows);
 for(const row of rows){
     const blob = new Blob([new Uint8Array(row.pdf_data)], {
@@ -78,7 +78,12 @@ if(req.file)
     )
     const loader=new PDFLoader(blob);
     const docs = await loader.load();
+
+    console.log("PDF LOADED DOCS:", docs);
+console.log("NUMBER OF DOCS:", docs.length);
     const chunks=await splitter.splitDocuments(docs);
+
+    console.log("NUMBER OF CHUNKS:", chunks.length);
     const docsWithMetadata=chunks.map((chunk)=>new Document({pageContent:chunk.pageContent,metadata:{pdfId:1000,filename:req.file.originalname,temporary:true}}));
     console.log("docmetdatatemp..........",docsWithMetadata);
     allDocs.push(...docsWithMetadata);
@@ -141,7 +146,7 @@ catch(error)
 }
 const getSession=async(req,res)=>{
     try{
-        const userId=parseInt(req.params.userid);
+        const userId=req.userId;
         console.log("userid...........",userId);
         const[rows]=await db.query(`select id,session_name from chat_session where user_id=? order by created_at DESC`,[userId]);
         console.log("rows.........",rows);
@@ -160,9 +165,8 @@ const getSession=async(req,res)=>{
 const getMessages=async(req,res)=>{
     try{
     const sessionId=parseInt(req.params.sessionId);
-    console.log("sessionid........",sessionId);
-    const [rows]=await db.query(`select question,answer from chat_messages where session_id=? order by id`,[sessionId]);
-    console.log("rows of session............",rows);
+    const userId = req.userId;
+    const [rows]=await db.query(`select cm.question,cm.answer from chat_messages cm join chat_session cs on cm.session_id=cs.id where cm.session_id=? and cs.user_id=? order by cm.id`,[sessionId,userId]);
     res.json({
         success:true,
         messages:rows

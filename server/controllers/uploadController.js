@@ -15,7 +15,7 @@ const upload=async(req,res)=>{
         }
         const filename=req.file.originalname;
         const pdfData=req.file.buffer;
-        const userId=req.body.userid;
+        const userId=req.userId;
         console.log("BODY:", req.body);
 console.log("FILE:", req.file);
         console.log({ db }, "log .........................");
@@ -38,7 +38,7 @@ res.json({
 }
 const fetch=async(req,res)=>{
 try{
-    const userid=req.params.id;
+    const userid=req.userId;
     const [rows]=await db.query("select id,filename from pdf_files where userid=?",[userid]);
     console.log(rows);
     res.json({
@@ -58,7 +58,8 @@ catch(error){
 const deleteFile=async(req,res)=>{
     try{
         const fileId=parseInt(req.params.id);
-        const [result]=await db.query("delete from pdf_files where id=?",[fileId]);
+        const userId = req.userId;
+        const [result]=await db.query("delete from pdf_files where id=? and userid=?",[fileId,userId]);
         if(result.affectedRows===0){
             return res.status(404).json({
                 success:false,

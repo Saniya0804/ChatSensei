@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 export default function Dashboard() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState("upload");
 
     const [file, setFile] = useState<File | null>(null);
@@ -33,7 +34,6 @@ export default function Dashboard() {
 
     const [uploading, setUploading] = useState(false);
 
-
     // ==================================================
     // UPLOAD PDF
     // ==================================================
@@ -46,9 +46,8 @@ export default function Dashboard() {
             return;
         }
 
-        const userid = localStorage.getItem("userid");
-
-        if (!userid) {
+const token = localStorage.getItem("token");
+        if (!token) {
             alert("please login first");
             return;
         }
@@ -60,12 +59,14 @@ export default function Dashboard() {
 
             formData.append("pdf", file);
 
-            formData.append("userid", userid);
 
             const response = await fetch(
                 "http://localhost:8000/upload/files",
                 {
                     method: "POST",
+                     headers: {
+            "Authorization": `Bearer ${token}`
+        },
                     body: formData
                 }
             );
@@ -98,15 +99,19 @@ export default function Dashboard() {
 
     const fetchFiles = async () => {
         try {
-            const userid = localStorage.getItem("userid");
-
-            if (!userid) {
+const token = localStorage.getItem("token");
+            if (!token) {
                 alert("please login first");
                 return;
             }
 
             const response = await fetch(
-                `http://localhost:8000/upload/files/${userid}`
+                "http://localhost:8000/upload/files",
+                {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }
             );
 
             const data = await response.json();
@@ -114,7 +119,9 @@ export default function Dashboard() {
             if (data.success) {
                 setFiles(data.files);
             }
-
+else {
+            alert(data.message || "Unable to fetch files");
+        }
         } catch (error) {
             console.log(error);
         }
@@ -127,9 +134,9 @@ export default function Dashboard() {
 
     const createSession = async () => {
         try {
-            const userid = localStorage.getItem("userid");
+            const token = localStorage.getItem("token");
 
-            if (!userid) {
+            if (!token) {
                 alert("please login first");
                 return;
             }
@@ -140,12 +147,9 @@ export default function Dashboard() {
                     method: "POST",
 
                     headers: {
-                        "Content-type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        userid
-                    })
+                        "Content-type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
                 }
             );
 
@@ -177,9 +181,8 @@ export default function Dashboard() {
 
     const sendQuestion = async () => {
         try {
-            const userid = localStorage.getItem("userid");
-
-            if (!userid) {
+            const token = localStorage.getItem("token");
+            if (!token) {
                 alert("please login first");
                 return;
             }
@@ -210,9 +213,12 @@ export default function Dashboard() {
             }
 
             const response = await fetch(
-                `http://localhost:8000/chat/ask/${userid}`,
+                "http://localhost:8000/chat/ask",
                 {
                     method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: formData
                 }
             );
@@ -254,15 +260,19 @@ export default function Dashboard() {
     // ==================================================
 
     const fetchSessions = async () => {
-        const userId = localStorage.getItem("userid");
-
-        if (!userId) {
+const token = localStorage.getItem("token");
+        if (!token) {
             return;
         }
 
         try {
             const response = await fetch(
-                `http://localhost:8000/chat/session/${userId}`
+                "http://localhost:8000/chat/session",
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
             );
 
             const data = await response.json();
@@ -278,6 +288,11 @@ export default function Dashboard() {
 
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+    if (!token) {
+        router.push("/login");
+        return;
+    }
         fetchSessions();
     }, []);
 
@@ -297,10 +312,19 @@ export default function Dashboard() {
         setQuestion("");
 
         setTempPdf(null);
-
+const token = localStorage.getItem("token");
+        if (!token) {
+            alert("please login first");
+            return;
+        }
         try {
             const response = await fetch(
-                `http://localhost:8000/chat/messages/${sessionId}`
+                `http://localhost:8000/chat/messages/${sessionId}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
             );
 
             const data = await response.json();
@@ -320,11 +344,20 @@ export default function Dashboard() {
     // ==================================================
 
     const handleDelete = async (fileId: number) => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("please login first");
+            return;
+        }
+
         try {
             const response = await fetch(
                 `http://localhost:8000/upload/deleteFiles/${fileId}`,
                 {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 }
             );
 

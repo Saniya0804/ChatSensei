@@ -1,14 +1,24 @@
 import express from "express";
 import { db } from "../server.js";
+import bcrypt from "bcryptjs";
 const register=async(req,res)=>{
 try{
     const {username,password}=req.body;
-    console.log("test................");
-    console.log(username);
-    console.log(password);
+    const [existing]=await db.query(
+        "SELECT * FROM users where username=?",[username]
+    );
+    if(existing.length>0)
+    {
+        res.json({
+            success: false,
+            message: "Username already exists",
+        });
+        return;
+    }
+    const hashedPassword=await bcrypt.hash(password,10);
     await db.query(
         "INSERT INTO users(username,password) VALUES(?,?)",
-      [username,password]
+      [username,hashedPassword]
     );
     res.json({
         success: true,

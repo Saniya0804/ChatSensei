@@ -38,6 +38,7 @@ function Login() {
 
             if (data.success) {
                 localStorage.setItem("userid", data.userid);
+                localStorage.setItem("token", data.token);
 
                 router.push("/dashboard");
             } else {

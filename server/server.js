@@ -16,9 +16,9 @@ import registerRoutes from "./routes/registerUsers.js";
 import loginRoutes from "./routes/loginUsers.js";
 import chatRoutes from "./routes/chatSession.js";
 export const db=await mysql.createConnection({
-    host:"localhost",
-    user:"root",
-    password:"19November()",
+    host:process.env.DB_HOST,
+    user:process.env.DB_USER,
+    password:process.env.DB_PASSWORD,
 });
 console.log("Connected to MySQL database");
 await db.query("create database if not exists pdf_chatbot");

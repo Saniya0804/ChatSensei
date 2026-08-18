@@ -21,7 +21,6 @@ export default function Dashboard() {
         { question: string; answer: string }[]
     >([]);
 
-    const [tempPdf, setTempPdf] = useState<File | null>(null);
 
     const [sessions, setSessions] = useState<
         { id: number; session_name: string }[]
@@ -164,8 +163,6 @@ else {
 
                 setQuestion("");
 
-                setTempPdf(null);
-
                 fetchSessions();
             }
 
@@ -208,10 +205,6 @@ else {
                 currentSessionId.toString()
             );
 
-            if (tempPdf) {
-                formData.append("tempPdf", tempPdf);
-            }
-
             const response = await fetch(
                 "http://localhost:8000/chat/ask",
                 {
@@ -237,8 +230,6 @@ else {
                 fetchSessions();
 
                 setQuestion("");
-
-                setTempPdf(null);
 
             } else {
                 alert(data.message);
@@ -311,7 +302,6 @@ const token = localStorage.getItem("token");
 
         setQuestion("");
 
-        setTempPdf(null);
 const token = localStorage.getItem("token");
         if (!token) {
             alert("please login first");
@@ -937,72 +927,8 @@ const token = localStorage.getItem("token");
                                     <div className="bg-slate-900 border border-slate-700 focus-within:border-indigo-500 rounded-2xl p-3 transition">
 
 
-                                        {/* Temporary PDF */}
-
-                                        {tempPdf && (
-
-                                            <div className="mb-3">
-
-                                                <div className="inline-flex max-w-sm items-center gap-3 bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg">
-
-                                                    <span>
-                                                        📄
-                                                    </span>
-
-                                                    <span className="text-sm text-slate-300 truncate">
-                                                        {tempPdf.name}
-                                                    </span>
-
-
-                                                    <button
-                                                        type="button"
-
-                                                        onClick={() => {
-                                                            setTempPdf(null);
-                                                        }}
-
-                                                        className="text-slate-500 hover:text-red-400 transition"
-                                                    >
-                                                        ✕
-                                                    </button>
-
-                                                </div>
-
-                                            </div>
-
-                                        )}
-
 
                                         <div className="flex items-center gap-2">
-
-
-                                            {/* Hidden File Input */}
-
-                                            <input
-                                                type="file"
-                                                id="tempPdf"
-                                                accept=".pdf"
-                                                className="hidden"
-
-                                                onChange={(e) => {
-                                                    if (e.target.files) {
-                                                        setTempPdf(
-                                                            e.target.files[0]
-                                                        );
-                                                    }
-                                                }}
-                                            />
-
-
-                                            {/* Attach PDF */}
-
-                                            <label
-                                                htmlFor="tempPdf"
-                                                title="Attach PDF for this question"
-                                                className="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer transition"
-                                            >
-                                                📎
-                                            </label>
 
 
                                             {/* Question */}
@@ -1051,7 +977,7 @@ const token = localStorage.getItem("token");
 
 
                                     <p className="text-center text-[11px] text-slate-600 mt-3">
-                                        Attach a PDF to use it as temporary context for a single question.
+                                        Ask question based on your uploaded documents. The AI will analyze the content and provide relevant answers.
                                     </p>
 
                                 </div>

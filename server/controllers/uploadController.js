@@ -8,11 +8,17 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
 import fs from "fs/promises";
 import { getUserStorePath, storeExists } from "../utils/vectorStore.js";
+import { rebuildUserIndex } from "../utils/rebuildIndex.js";
 import dotenv from "dotenv";
 dotenv.config();
 const storage=multer.memoryStorage();
 const uploadMiddleware=multer({
-    storage:storage
+    storage:storage,
+    limits:{fileSize:10*1024*1024},
+    fileFilter:(req,file,cb)=>{
+        if(file.mimetype!=="application/pdf") return cb(new Error("Only PDF files are allowed"));
+        cb(null,true);
+    }
 }).single("pdf");
 
 const splitter = new RecursiveCharacterTextSplitter({
@@ -59,14 +65,13 @@ const upload=async(req,res)=>{
     const storePath = getUserStorePath(userId);
     await fs.mkdir(storePath, { recursive: true });
 
-    let vectorStore;
     if (await storeExists(storePath)) {
-      vectorStore = await HNSWLib.load(storePath, embeddings);
+      const vectorStore = await HNSWLib.load(storePath, embeddings);
       await vectorStore.addDocuments(docsWithMetadata);
+      await vectorStore.save(storePath);
     } else {
-      vectorStore = await HNSWLib.fromDocuments(docsWithMetadata, embeddings);
+      await rebuildUserIndex(userId);
     }
-    await vectorStore.save(storePath);
 res.json({
             success:true,
             message:"File uploaded successfully",
@@ -124,7 +129,7 @@ const deleteFile=async(req,res)=>{
         {
             const allDocs=[];
             for(const row of rows){
-                const blob=new blob([new Uint8Array(row.pdf_data)],{
+                const blob=new Blob([new Uint8Array(row.pdf_data)],{
                     type:"application/pdf"
                 });
                 const loader=new PDFLoader(blob);

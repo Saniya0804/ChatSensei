@@ -6,6 +6,7 @@ import {
 import { HNSWLib }from "@langchain/community/vectorstores/hnswlib";
 import { RetrievalQAChain }from "@langchain/classic/chains";
 import { getUserStorePath, storeExists } from "../utils/vectorStore.js";
+import { rebuildUserIndex } from "../utils/rebuildIndex.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -32,6 +33,10 @@ const question=req.body.question;
 const sessionId=parseInt(req.body.sessionId);
 
 const storePath=getUserStorePath(userid);
+if(!await storeExists(storePath))
+{
+    await rebuildUserIndex(userid);
+}
 if(!await storeExists(storePath))
 {
     return res.status(404).json({

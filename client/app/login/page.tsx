@@ -1,5 +1,5 @@
 "use client";
-
+import { API_URL } from "../config";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,7 +21,7 @@ function Login() {
             setLoading(true);
 
             const response = await fetch(
-                "http://localhost:8000/login/users",
+                "${API_URL}/login/users",
                 {
                     method: "POST",
                     headers: {

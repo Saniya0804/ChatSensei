@@ -1,5 +1,5 @@
 "use client";
-
+import { API_URL } from "../config";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,7 +21,7 @@ export default function Register() {
             setLoading(true);
 
             const response = await fetch(
-                "http://localhost:8000/register/users",
+                `${API_URL}/register/users`,
                 {
                     method: "POST",
                     headers: {

@@ -1,5 +1,5 @@
 "use client";
-
+import { API_URL } from "../config";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 export default function Dashboard() {
@@ -60,7 +60,7 @@ const token = localStorage.getItem("token");
 
 
             const response = await fetch(
-                "http://localhost:8000/upload/files",
+                `${API_URL}/upload/files`,
                 {
                     method: "POST",
                      headers: {
@@ -105,7 +105,7 @@ const token = localStorage.getItem("token");
             }
 
             const response = await fetch(
-                "http://localhost:8000/upload/files",
+                `${API_URL}/upload/files`,
                 {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -141,7 +141,7 @@ else {
             }
 
             const response = await fetch(
-                "http://localhost:8000/chat/session",
+                `${API_URL}/chat/session`,
                 {
                     method: "POST",
 
@@ -206,7 +206,7 @@ else {
             );
 
             const response = await fetch(
-                "http://localhost:8000/chat/ask",
+                `${API_URL}/chat/ask`,
                 {
                     method: "POST",
                     headers: {
@@ -258,7 +258,7 @@ const token = localStorage.getItem("token");
 
         try {
             const response = await fetch(
-                "http://localhost:8000/chat/session",
+                `${API_URL}/chat/session`,
                 {
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -309,7 +309,7 @@ const token = localStorage.getItem("token");
         }
         try {
             const response = await fetch(
-                `http://localhost:8000/chat/messages/${sessionId}`,
+                `${API_URL}/chat/messages/${sessionId}`,
                 {
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -342,7 +342,7 @@ const token = localStorage.getItem("token");
 
         try {
             const response = await fetch(
-                `http://localhost:8000/upload/deleteFiles/${fileId}`,
+                `${API_URL}/upload/deleteFiles/${fileId}`,
                 {
                     method: "DELETE",
                     headers: {

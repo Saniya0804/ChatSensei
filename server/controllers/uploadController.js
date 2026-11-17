@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { db } from "../server.js";
+import { db } from "../db.js";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Document } from "@langchain/core/documents";

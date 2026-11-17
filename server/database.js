@@ -1,4 +1,3 @@
-import {db} from "./server.js";
 export async function createTables(db){
     await db.query(`create table if not exists users(
         userId int primary key auto_increment not null,

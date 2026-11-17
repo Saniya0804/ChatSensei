@@ -1,4 +1,4 @@
-import { db } from "../server.js";
+import { db } from "../db.js";
 import {
     GoogleGenerativeAIEmbeddings,
     ChatGoogleGenerativeAI
@@ -7,6 +7,7 @@ import { HNSWLib }from "@langchain/community/vectorstores/hnswlib";
 import { RetrievalQAChain }from "@langchain/classic/chains";
 import { getUserStorePath, storeExists } from "../utils/vectorStore.js";
 import { rebuildUserIndex } from "../utils/rebuildIndex.js";
+import { AppError } from "../utils/AppError.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -32,6 +33,11 @@ const userid=req.userId;
 const question=req.body.question;
 const sessionId=parseInt(req.body.sessionId);
 
+const [own] = await db.query(
+  "select 1 from chat_session where id=? and user_id=?",
+  [sessionId, userid]
+);
+if (own.length === 0) throw new AppError(404, "Chat not found");
 const storePath=getUserStorePath(userid);
 if(!await storeExists(storePath))
 {

@@ -1,0 +1,3 @@
+{
+  "ignore": ["vector_stores/*", "node_modules/*"]
+}

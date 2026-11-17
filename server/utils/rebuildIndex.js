@@ -4,7 +4,7 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Document } from "@langchain/core/documents";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { HNSWLib } from "@langchain/community/vectorstores/hnswlib";
-import { db } from "../server.js";
+import { db } from "../db.js";
 import { getUserStorePath } from "./vectorStore.js";
 
 const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000, chunkOverlap: 200 });
